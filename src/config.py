@@ -15,7 +15,7 @@ class Settings:
     def load() -> "Settings":
         groq_api_key = os.getenv("GROQ_API_KEY", "").strip()
         tavily_api_key = os.getenv("TAVILY_API_KEY", "").strip()
-        groq_model = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant").strip() or "llama-3.1-8b-instant"
+        groq_model = os.getenv("GROQ_MODEL", "llama3-70b-8192").strip() or "llama3-70b-8192"
         chroma_persist_dir = os.getenv("CHROMA_PERSIST_DIR", ".chroma").strip() or ".chroma"
         return Settings(
             groq_api_key=groq_api_key,

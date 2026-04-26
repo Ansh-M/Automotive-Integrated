@@ -12,26 +12,22 @@ def build_llm(settings: Settings) -> LLM:
         model=model,
         api_key=settings.groq_api_key,
         temperature=0.1,
-        max_tokens=2048,  # was 800 — too low to output a complete JSON brief
+        max_tokens=1024,
     )
 
 
 def researcher_agent(llm: LLM, tools: list) -> Agent:
-    # NOTE: AutomotiveWebResearchTool (tools.py) is intentionally not wired here.
-    # Source fetching is handled upstream in _fetch_sources() (workflow.py) before
-    # the crew runs, so the researcher receives pre-fetched sources via sources_json.
-    # Pass the tool instance in the tools list here if you want agent-driven fetching.
     return Agent(
         role="Automotive Researcher",
-        goal="Extract accurate vehicle specifications from provided sources and output strict JSON.",
+        goal="Search for accurate vehicle specifications using tools and output strict JSON.",
         backstory=(
-            "You are a precise automotive data analyst. You extract facts from sources. "
+            "You are a precise automotive data analyst. You use search tools to find facts. "
             "You never guess. You always output clean JSON with no extra text."
         ),
         tools=tools,
         llm=llm,
         verbose=False,
-        max_iter=3,
+        max_iter=5,
         max_retry_limit=1,
     )
 
