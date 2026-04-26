@@ -35,7 +35,7 @@ class AutomotiveWebResearchTool(BaseTool):
     def _run(self, query: str) -> str:
         nq = normalize_vehicle_query(query)
         norm_query = nq.normalized or query
-        # Try local cache first (fast + free)
+      
         cached = self._cache.search(self._vehicle_key, query=norm_query, k=min(5, self._max_results))
         cached_sources = []
         for c in cached:

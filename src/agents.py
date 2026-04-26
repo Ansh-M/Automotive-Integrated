@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from crewai import Agent, LLM
-
 from .config import Settings
 
 
@@ -12,37 +11,42 @@ def build_llm(settings: Settings) -> LLM:
     return LLM(
         model=model,
         api_key=settings.groq_api_key,
-        temperature=0.2,
+        temperature=0.1,
+        max_tokens=2048,  # was 800 — too low to output a complete JSON brief
     )
 
 
 def researcher_agent(llm: LLM, tools: list) -> Agent:
+    # NOTE: AutomotiveWebResearchTool (tools.py) is intentionally not wired here.
+    # Source fetching is handled upstream in _fetch_sources() (workflow.py) before
+    # the crew runs, so the researcher receives pre-fetched sources via sources_json.
+    # Pass the tool instance in the tools list here if you want agent-driven fetching.
     return Agent(
         role="Automotive Researcher",
-        goal=(
-            "Collect accurate, sourced automotive specifications and facts, "
-            "and output a strict JSON brief for downstream writing."
-        ),
+        goal="Extract accurate vehicle specifications from provided sources and output strict JSON.",
         backstory=(
-            "You are a meticulous automotive analyst. You never guess specs. "
-            "When data is uncertain or market-dependent, you explicitly say so and cite sources."
+            "You are a precise automotive data analyst. You extract facts from sources. "
+            "You never guess. You always output clean JSON with no extra text."
         ),
         tools=tools,
         llm=llm,
-        verbose=True,
+        verbose=False,
+        max_iter=3,
+        max_retry_limit=1,
     )
 
 
 def writer_agent(llm: LLM) -> Agent:
     return Agent(
         role="Automotive Writer",
-        goal="Turn a structured research brief into a clean, well-formatted report for users.",
+        goal="Convert a JSON research brief into a clean, well-structured Markdown report.",
         backstory=(
-            "You are a technical writer specialized in car spec sheets. "
-            "You preserve accuracy, keep formatting consistent, and include citations."
+            "You are a technical writer for automotive publications. "
+            "You write clearly, accurately, and never add facts not in the brief."
         ),
         tools=[],
         llm=llm,
-        verbose=True,
+        verbose=False,
+        max_iter=2,
+        max_retry_limit=1,
     )
-

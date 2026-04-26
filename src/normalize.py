@@ -63,7 +63,6 @@ def normalize_vehicle_query(query: str) -> NormalizedVehicleQuery:
     q = re.sub(r"[^\w\s\-]", " ", q)  # keep words, spaces, hyphens
     q = re.sub(r"\s+", " ", q).strip()
 
-    # Extract year (first 19xx/20xx found)
     year: Optional[int] = None
     m = re.search(r"\b(19\d{2}|20\d{2})\b", q)
     if m:
@@ -82,7 +81,6 @@ def normalize_vehicle_query(query: str) -> NormalizedVehicleQuery:
             continue
         cleaned_tokens.append(t)
 
-    # Best-effort make/model extraction from first tokens (excluding year)
     make: Optional[str] = None
     model: Optional[str] = None
     mm_tokens = [t for t in cleaned_tokens if not re.fullmatch(r"(19\d{2}|20\d{2})", t)]

@@ -4,10 +4,10 @@ crewai-tools>=0.14
 langchain-groq>=0.1.9
 python-dotenv>=1.0.1
 chromadb>=0.5.5
-sentence-transformers>=3.0.1
+onnxruntime>=1.17
 tavily-python>=0.5.0
 pydantic>=2.7
 requests>=2.32
 litellm>=1.40
 groq>=0.9
-
+Pillow>=10.2.0

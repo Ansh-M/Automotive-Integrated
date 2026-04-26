@@ -6,7 +6,7 @@ import json
 from typing import Iterable, Optional
 
 import chromadb
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2
 
 
 def _stable_id(*parts: str) -> str:
@@ -24,7 +24,7 @@ class ChromaSourceCache:
 
     def __post_init__(self) -> None:
         self._client = chromadb.PersistentClient(path=self.persist_dir)
-        self._embed_fn = SentenceTransformerEmbeddingFunction(model_name="sentence-transformers/all-MiniLM-L6-V2")
+        self._embed_fn = ONNXMiniLM_L6_V2()
         self._collection = self._client.get_or_create_collection(
             name=self.collection_name,
             embedding_function=self._embed_fn,
