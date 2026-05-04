@@ -8,6 +8,11 @@ def render_compare_tab() -> None:
     st.markdown("### Compare two cars side by side")
     st.caption("Both cars are researched in parallel by AI agents, then compared across key specs.")
 
+    if "_pending_compare_a" in st.session_state:
+        st.session_state.compare_a = st.session_state.pop("_pending_compare_a")
+    if "_pending_compare_b" in st.session_state:
+        st.session_state.compare_b = st.session_state.pop("_pending_compare_b")
+
     with st.container(border=True):
         col_a, col_vs, col_b = st.columns([5, 1, 5])
         with col_a:
@@ -34,8 +39,8 @@ def render_compare_tab() -> None:
         ]
         for col, (label, va, vb) in zip([cc1, cc2, cc3], comp_examples):
             if col.button(label, key=f"cc_{label}", use_container_width=True):
-                st.session_state.compare_a = va
-                st.session_state.compare_b = vb
+                st.session_state._pending_compare_a = va
+                st.session_state._pending_compare_b = vb
                 st.rerun()
 
         compare_btn = st.button("Compare Cars", type="primary", use_container_width=True)

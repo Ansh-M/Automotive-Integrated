@@ -8,6 +8,9 @@ def render_concept_tab() -> None:
     st.markdown("### Generate an automotive design concept")
     st.caption("Enter any concept — the AI generates a detailed design narrative and an optimized image generation prompt.")
 
+    if "_pending_concept" in st.session_state:
+        st.session_state.concept_input = st.session_state.pop("_pending_concept")
+
     with st.container(border=True):
         concept_input = st.text_area(
             "Your concept",
@@ -29,7 +32,7 @@ def render_concept_tab() -> None:
         ]
         for col, (label, val) in zip([ic1, ic2, ic3], concept_examples):
             if col.button(label, key=f"ci_{label}", use_container_width=True):
-                st.session_state.concept_input = val
+                st.session_state._pending_concept = val
                 st.rerun()
 
         concept_btn = st.button("Generate Concept", type="primary", use_container_width=True)
