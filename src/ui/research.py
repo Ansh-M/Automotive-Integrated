@@ -39,6 +39,11 @@ def render_research_tab() -> None:
     st.markdown("### Research any car — powered by AI agents")
     st.caption("Two AI agents (Researcher + Writer) fetch live web data, synthesize specs, and generate a structured report.")
 
+    # If an example button was clicked on the previous run, pre-set the
+    # widget key BEFORE the widget is instantiated so Streamlit accepts it.
+    if "_pending_query" in st.session_state:
+        st.session_state.research_query = st.session_state.pop("_pending_query")
+
     with st.container(border=True):
         col_input, col_btn = st.columns([5, 1])
         with col_input:
@@ -61,7 +66,7 @@ def render_research_tab() -> None:
         ]
         for col, (label, val) in zip([ec1, ec2, ec3, ec4], examples):
             if col.button(label, key=f"ex_{label}", use_container_width=True):
-                st.session_state.research_query = val
+                st.session_state._pending_query = val
                 st.rerun()
 
     if research_btn and vehicle_query.strip():
