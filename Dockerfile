@@ -13,13 +13,10 @@ RUN pip install --upgrade pip \
 
 COPY . .
 
+# HOME=/app ensures ONNXMiniLM_L6_V2 (which hardcodes Path.home()/.cache/chroma)
+# writes to /app/.cache/chroma — which is mounted as a persistent volume.
+ENV HOME=/app
 ENV CHROMA_CACHE_DIR=/app/.chroma_cache
-
-RUN python -c "\
-import os; os.makedirs('/app/.chroma_cache', exist_ok=True); \
-from chromadb.utils.embedding_functions import ONNXMiniLM_L6_V2; \
-ef = ONNXMiniLM_L6_V2(); \
-print('ONNX model downloaded successfully')"
 
 RUN mkdir -p data/generated_images && mkdir -p .chroma
 

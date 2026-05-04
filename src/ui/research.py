@@ -7,21 +7,12 @@ from src.workflow import run_automotive_crew
 
 
 def _md_table_to_html(md: str) -> str:
-    """Convert any markdown pipe tables in a report to HTML tables so
-    Streamlit renders them correctly via unsafe_allow_html=True."""
-
-    table_pattern = re.compile(
-        r'((?:\|.*\|\n)+)',
-        re.MULTILINE
-    )
+    table_pattern = re.compile(r'((?:\|.*\|\n)+)', re.MULTILINE)
 
     def convert_table(match: re.Match) -> str:
         raw = match.group(1).strip()
         rows = [r.strip() for r in raw.split("\n") if r.strip()]
-
-        # filter out separator rows like |---|---|
         data_rows = [r for r in rows if not re.match(r'^\|[\s\-|:]+\|$', r)]
-
         if len(data_rows) < 1:
             return match.group(0)
 
@@ -30,17 +21,14 @@ def _md_table_to_html(md: str) -> str:
 
         header = parse_row(data_rows[0])
         body = data_rows[1:]
-
         th = "".join(f"<th style='padding:8px 12px;border:1px solid #374151;background:#1f2937;color:#f9fafb;text-align:left'>{h}</th>" for h in header)
         thead = f"<thead><tr>{th}</tr></thead>"
-
         tbody_rows = ""
         for i, row in enumerate(body):
             cells = parse_row(row)
             bg = "#111827" if i % 2 == 0 else "#1a2332"
             td = "".join(f"<td style='padding:8px 12px;border:1px solid #374151;color:#e5e7eb'>{c}</td>" for c in cells)
             tbody_rows += f"<tr style='background:{bg}'>{td}</tr>"
-
         tbody = f"<tbody>{tbody_rows}</tbody>"
         return f"<div style='overflow-x:auto;margin:1rem 0'><table style='border-collapse:collapse;width:100%;font-size:0.9rem'>{thead}{tbody}</table></div>\n"
 
@@ -107,7 +95,6 @@ def render_research_tab() -> None:
         rep_tab, src_tab, debug_tab = st.tabs(["📄 Report", "🔗 Sources", "🧠 Debug"])
 
         with rep_tab:
-            # Convert markdown tables to HTML so Streamlit renders them correctly
             rendered_report = _md_table_to_html(out.markdown_report)
             st.markdown(rendered_report, unsafe_allow_html=True)
             st.download_button(

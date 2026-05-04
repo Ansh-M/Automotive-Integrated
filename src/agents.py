@@ -12,7 +12,7 @@ def build_llm(settings: Settings) -> LLM:
         model=model,
         api_key=settings.groq_api_key,
         temperature=0.1,
-        max_tokens=1024,
+        max_tokens=2048,
     )
 
 
