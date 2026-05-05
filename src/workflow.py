@@ -127,7 +127,9 @@ def run_automotive_crew(vehicle: VehicleQuery) -> WriterOutput:
     if not settings.tavily_api_key:
         raise RuntimeError("TAVILY_API_KEY is not set. Contact the app admin to configure server API keys.")
 
-    llm = build_llm(settings)
+    # Researcher needs more tokens for JSON output; writer just formats existing data.
+    llm = build_llm(settings, max_tokens=2048)
+    llm_writer = build_llm(settings, max_tokens=1024)
     cache = ChromaSourceCache(persist_dir=settings.chroma_persist_dir)
 
     vehicle_key = _vehicle_key(vehicle)
@@ -141,7 +143,7 @@ def run_automotive_crew(vehicle: VehicleQuery) -> WriterOutput:
     )
 
     researcher = researcher_agent(llm=llm, tools=[research_tool])
-    writer = writer_agent(llm=llm)
+    writer = writer_agent(llm=llm_writer)
     research_task = build_research_task(researcher)
     writer_task = build_writer_task(writer, research_task)
 
@@ -213,6 +215,8 @@ def run_comparison(query_a: str, query_b: str) -> tuple[WriterOutput, WriterOutp
     va = VehicleQuery(query=query_a)
     vb = VehicleQuery(query=query_b)
     result_a = run_automotive_crew(va)
-    time.sleep(10)
+    # Small pause — just enough to avoid hitting TPM in the same second.
+    # Token usage is kept low via max_tokens=1024 on the writer agent.
+    time.sleep(5)
     result_b = run_automotive_crew(vb)
     return result_a, result_b

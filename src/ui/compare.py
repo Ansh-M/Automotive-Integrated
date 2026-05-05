@@ -6,7 +6,7 @@ from src.workflow import run_comparison
 
 def render_compare_tab() -> None:
     st.markdown("### Compare two cars side by side")
-    st.caption("Both cars are researched in parallel by AI agents, then compared across key specs.")
+    st.caption("Both cars are researched by AI agents, then compared across key specs.")
 
     if "_pending_compare_a" in st.session_state:
         st.session_state.compare_a = st.session_state.pop("_pending_compare_a")
@@ -46,20 +46,20 @@ def render_compare_tab() -> None:
         compare_btn = st.button("Compare Cars", type="primary", use_container_width=True)
 
     if compare_btn and car_a.strip() and car_b.strip():
-        with st.status("Researching both cars in parallel...", expanded=True) as status:
+        with st.status("Researching both cars...", expanded=True) as status:
             st.write(f"Agent A → {car_a}")
             st.write(f"Agent B → {car_b}")
             t0 = time.time()
             try:
                 out_a, out_b = run_comparison(car_a.strip(), car_b.strip())
                 elapsed = round(time.time() - t0, 1)
-                status.update(label=f"Both researched in {elapsed}s", state="complete")
+                status.update(label=f"Done in {elapsed}s", state="complete")
             except Exception as e:
                 status.update(label="Error", state="error")
                 st.error(f"Comparison failed: {e}")
                 st.stop()
 
-        st.success(f"Comparison completed in {elapsed}s (parallel)")
+        st.success(f"Comparison completed in {elapsed}s")
         st.markdown("<br>", unsafe_allow_html=True)
 
         col_l, col_r = st.columns(2)

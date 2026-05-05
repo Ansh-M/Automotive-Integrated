@@ -23,7 +23,7 @@ class AutomotiveWebResearchTool(BaseTool):
         cache: ChromaSourceCache,
         vehicle_key: str,
         include_answer: bool = False,
-        max_results: int = 6,
+        max_results: int = 3,
     ) -> None:
         super().__init__()
         self._client = TavilyClient(api_key=tavily_api_key)
@@ -46,7 +46,7 @@ class AutomotiveWebResearchTool(BaseTool):
                     {
                         "title": md.get("title") or "Cached source",
                         "url": md.get("url"),
-                        "snippet": doc[:280],
+                        "snippet": doc[:200],
                         "source_type": "cache",
                     }
                 )
@@ -85,7 +85,7 @@ class AutomotiveWebResearchTool(BaseTool):
                 {
                     "title": title,
                     "url": url,
-                    "snippet": snippet[:380] if snippet else None,
+                    "snippet": snippet[:200] if snippet else None,
                     "source_type": "web",
                 }
             )

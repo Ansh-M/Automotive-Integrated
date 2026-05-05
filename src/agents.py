@@ -4,7 +4,7 @@ from crewai import Agent, LLM
 from .config import Settings
 
 
-def build_llm(settings: Settings) -> LLM:
+def build_llm(settings: Settings, max_tokens: int = 2048) -> LLM:
     model = settings.groq_model.strip()
     if "/" not in model:
         model = f"groq/{model}"
@@ -12,7 +12,7 @@ def build_llm(settings: Settings) -> LLM:
         model=model,
         api_key=settings.groq_api_key,
         temperature=0.1,
-        max_tokens=2048,
+        max_tokens=max_tokens,
     )
 
 

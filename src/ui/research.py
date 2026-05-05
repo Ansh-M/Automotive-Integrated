@@ -71,12 +71,12 @@ def render_research_tab() -> None:
 
     if research_btn and vehicle_query.strip():
         with st.status("Running AI agents...", expanded=True) as status:
-            st.write("Fetching web sources (Tavily)...")
+            st.write("Searching the web...")
             t0 = time.time()
             try:
-                st.write("Researcher agent synthesizing specs...")
+                st.write("Analyzing vehicle data...")
                 out = run_automotive_crew(VehicleQuery(query=vehicle_query.strip()))
-                st.write("Writer agent formatting report...")
+                st.write("Generating report...")
                 elapsed = round(time.time() - t0, 1)
                 status.update(label=f"Done in {elapsed}s", state="complete")
             except Exception as e:

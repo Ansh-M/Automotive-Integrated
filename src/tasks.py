@@ -6,12 +6,9 @@ def build_research_task(researcher) -> Task:
     return Task(
         description=(
             "Research the vehicle: {vehicle_query}.\n\n"
-            "Use the Automotive_Web_Research tool. Make 4-5 targeted searches:\n"
-            "  - '{vehicle_query} engine power torque specs'\n"
-            "  - '{vehicle_query} dimensions weight kerb weight'\n"
-            "  - '{vehicle_query} price on road variants India'\n"
-            "  - '{vehicle_query} safety rating NCAP airbags'\n"
-            "  - '{vehicle_query} features infotainment ADAS'\n\n"
+            "Use the Automotive_Web_Research tool. Make 2-3 targeted searches:\n"
+            "  - '{vehicle_query} engine specs power torque transmission'\n"
+            "  - '{vehicle_query} price dimensions safety features India'\n\n"
             "After ALL searches, output a single JSON object — nothing else.\n"
             "Use EXACT values from sources. Use 'N/A' only if truly not found after searching.\n\n"
             "{{\n"
