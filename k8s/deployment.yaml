@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: autoverse-ai
+  namespace: autoverse-ai
   labels:
     app: autoverse-ai
 spec:
@@ -9,16 +10,36 @@ spec:
   selector:
     matchLabels:
       app: autoverse-ai
+  strategy:
+    type: Recreate       
   template:
     metadata:
       labels:
         app: autoverse-ai
     spec:
+     
+      initContainers:
+        - name: init-dirs
+          image: busybox:1.36
+          command: ["sh", "-c", "mkdir -p /app/.chroma /app/.chroma_cache && chmod -R 777 /app/.chroma /app/.chroma_cache"]
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /app/.chroma
+            - name: onnx-cache
+              mountPath: /app/.chroma_cache
+
       containers:
         - name: autoverse-ai
-          image: DOCKER_USERNAME/autoverse-ai:latest
+          image: anshmundra/autoverse-ai:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8501
+              name: streamlit
+
+         
+          envFrom:
+            - configMapRef:
+                name: autoverse-config
           env:
             - name: GROQ_API_KEY
               valueFrom:
@@ -30,33 +51,50 @@ spec:
                 secretKeyRef:
                   name: autoverse-secrets
                   key: TAVILY_API_KEY
-            - name: GROQ_MODEL
-              value: "llama-3.1-8b-instant"
-            - name: CHROMA_PERSIST_DIR
-              value: "/app/.chroma"
+
+          
           resources:
             requests:
               memory: "512Mi"
               cpu: "250m"
             limits:
               memory: "1Gi"
-              cpu: "500m"
+              cpu: "750m"
+
+          
+          startupProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            failureThreshold: 18
+            periodSeconds: 10
           livenessProbe:
             httpGet:
               path: /_stcore/health
               port: 8501
-            initialDelaySeconds: 30
-            periodSeconds: 15
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: autoverse-ai-service
-spec:
-  selector:
-    app: autoverse-ai
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8501
-  type: NodePort
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /_stcore/health
+              port: 8501
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+
+         
+          volumeMounts:
+            - name: chroma-storage
+              mountPath: /app/.chroma
+            - name: onnx-cache
+              mountPath: /app/.chroma_cache
+
+      volumes:
+        - name: chroma-storage
+          persistentVolumeClaim:
+            claimName: autoverse-chroma-pvc
+        - name: onnx-cache
+          persistentVolumeClaim:
+            claimName: autoverse-onnx-pvc
